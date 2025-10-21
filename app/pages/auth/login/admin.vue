@@ -60,6 +60,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       pass: formData.password
     }
 
+    console.log(signInDetails)
+
     const token = await $signin(signInDetails)
 
     // Store the token
@@ -73,7 +75,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     })
 
     // Redirect to admin dashboard or appropriate page
-    await navigateTo('/dashboard')
+    await navigateTo('/panel/admin')
   } catch (error: any) {
     toast.add({
       title: 'Login failed. Please try again',

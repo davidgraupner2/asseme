@@ -4,7 +4,7 @@ import type { DropdownMenuItem } from '@nuxt/ui'
 import type { Period, Range } from '~/types'
 
 definePageMeta({
-  layout: 'dashboard'
+  layout: 'admin-panel'
 })
 
 const { isNotificationsSlideoverOpen } = useDashboard()

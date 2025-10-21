@@ -2,6 +2,10 @@
 import * as z from 'zod'
 import type { FormSubmitEvent } from '@nuxt/ui'
 
+definePageMeta({
+  layout: 'admin-panel'
+})
+
 const fileRef = ref<HTMLInputElement>()
 
 const profileSchema = z.object({

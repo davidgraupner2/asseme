@@ -27,6 +27,7 @@
     "nuxt-og-image": "^5.1.11",
     "nuxt-surrealdb": "0.4.1",
     "pinia": "^3.0.3",
+    "pinia-plugin-persistedstate": "^4.5.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {

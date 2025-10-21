@@ -3,6 +3,10 @@ import { computed, ref, watch } from 'vue'
 import { breakpointsTailwind } from '@vueuse/core'
 import type { Mail } from '~/types'
 
+definePageMeta({
+  layout: 'admin-panel'
+})
+
 const tabItems = [
   {
     label: 'All',

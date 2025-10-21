@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// definePageMeta({
+//   layout: 'admin-panel'
+// })
+
 const state = reactive<{ [key: string]: boolean }>({
   email: true,
   desktop: false,

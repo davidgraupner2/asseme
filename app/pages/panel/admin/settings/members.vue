@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { Member } from '~/types'
 
+// definePageMeta({
+//   layout: 'admin-panel'
+// })
+
 const { data: members } = await useFetch<Member[]>('/api/members', { default: () => [] })
 
 const q = ref('')

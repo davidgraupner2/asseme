@@ -4,5 +4,17 @@ export default defineAppConfig({
       primary: 'violet',
       neutral: 'zinc'
     }
+  },
+  auth: {
+    publicPaths: ['/doc', '/pricing', '/blog', '/changelog', '/auth'],
+    adminPaths: ['/panel/admin'],
+    loginPaths: {
+      admin: '/auth/login/admin',
+      user: '/auth/login'
+    },
+    redirects: {
+      afterLogin: '/panel/admin',
+      afterLogout: '/'
+    }
   }
 })

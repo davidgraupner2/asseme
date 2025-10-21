@@ -19,7 +19,7 @@ const links = [
     {
       label: 'Inbox',
       icon: 'i-lucide-inbox',
-      to: '/inbox',
+      to: '/panel/admin/inbox',
       badge: '4',
       onSelect: () => {
         open.value = false
@@ -28,21 +28,21 @@ const links = [
     {
       label: 'Customers',
       icon: 'i-lucide-users',
-      to: '/customers',
+      to: '/panel/admin/customers',
       onSelect: () => {
         open.value = false
       }
     },
     {
       label: 'Settings',
-      to: '/settings',
+      to: '/panel/admin/settings',
       icon: 'i-lucide-settings',
       defaultOpen: true,
       type: 'trigger',
       children: [
         {
           label: 'General',
-          to: '/settings',
+          to: '/panel/admin/settings',
           exact: true,
           onSelect: () => {
             open.value = false
@@ -50,21 +50,21 @@ const links = [
         },
         {
           label: 'Members',
-          to: '/settings/members',
+          to: '/panel/admin/settings/members',
           onSelect: () => {
             open.value = false
           }
         },
         {
           label: 'Notifications',
-          to: '/settings/notifications',
+          to: '/panel/admin/settings/notifications',
           onSelect: () => {
             open.value = false
           }
         },
         {
           label: 'Security',
-          to: '/settings/security',
+          to: '/panel/admin/settings/security',
           onSelect: () => {
             open.value = false
           }

@@ -79,7 +79,7 @@ const { data: stats } = await useAsyncData<Stat[]>(
       :key="index"
       :icon="stat.icon"
       :title="stat.title"
-      to="/customers"
+      to="/panel/admin/customers"
       variant="subtle"
       :ui="{
         container: 'gap-y-1.5',
