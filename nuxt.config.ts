@@ -7,7 +7,8 @@ export default defineNuxtConfig({
     '@nuxt/content',
     '@vueuse/nuxt',
     'nuxt-og-image',
-    'nuxt-surrealdb'
+    'nuxt-surrealdb',
+    '@pinia/nuxt'
   ],
 
   $development: {

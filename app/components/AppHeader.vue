@@ -1,20 +1,25 @@
 <script setup lang="ts">
 const route = useRoute()
 
-const items = computed(() => [{
-  label: 'Docs',
-  to: '/docs',
-  active: route.path.startsWith('/docs')
-}, {
-  label: 'Pricing',
-  to: '/pricing'
-}, {
-  label: 'Blog',
-  to: '/blog'
-}, {
-  label: 'Changelog',
-  to: '/changelog'
-}])
+const items = computed(() => [
+  {
+    label: 'Docs',
+    to: '/docs',
+    active: route.path.startsWith('/docs')
+  },
+  {
+    label: 'Pricing',
+    to: '/pricing'
+  },
+  {
+    label: 'Blog',
+    to: '/blog'
+  },
+  {
+    label: 'Changelog',
+    to: '/changelog'
+  }
+])
 </script>
 
 <template>
@@ -26,10 +31,7 @@ const items = computed(() => [{
       <TemplateMenu />
     </template>
 
-    <UNavigationMenu
-      :items="items"
-      variant="link"
-    />
+    <UNavigationMenu :items="items" variant="link" />
 
     <template #right>
       <UColorModeButton />
@@ -38,7 +40,7 @@ const items = computed(() => [{
         icon="i-lucide-log-in"
         color="neutral"
         variant="ghost"
-        to="/login"
+        to="/auth/login"
         class="lg:hidden"
       />
 
@@ -46,7 +48,7 @@ const items = computed(() => [{
         label="Sign in"
         color="neutral"
         variant="outline"
-        to="/login"
+        to="/auth/login"
         class="hidden lg:inline-flex"
       />
 
@@ -60,11 +62,7 @@ const items = computed(() => [{
     </template>
 
     <template #body>
-      <UNavigationMenu
-        :items="items"
-        orientation="vertical"
-        class="-mx-2.5"
-      />
+      <UNavigationMenu :items="items" orientation="vertical" class="-mx-2.5" />
 
       <USeparator class="my-6" />
 
@@ -72,16 +70,11 @@ const items = computed(() => [{
         label="Sign in"
         color="neutral"
         variant="subtle"
-        to="/login"
+        to="/auth/login"
         block
         class="mb-3"
       />
-      <UButton
-        label="Sign up"
-        color="neutral"
-        to="/signup"
-        block
-      />
+      <UButton label="Sign up" color="neutral" to="/signup" block />
     </template>
   </UHeader>
 </template>

@@ -74,7 +74,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
       color: 'success'
     })
 
-    await navigateTo('/login')
+    await navigateTo('/auth/login')
   } catch (error: unknown) {
     console.error('Signup error:', error)
 
@@ -108,7 +108,8 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     @submit="onSubmit"
   >
     <template #description>
-      Already have an account? <ULink to="/login" class="text-primary font-medium">Login</ULink>.
+      Already have an account?
+      <ULink to="/auth/login" class="text-primary font-medium">Login</ULink>.
     </template>
 
     <template #footer>
