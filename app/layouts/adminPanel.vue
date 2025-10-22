@@ -11,7 +11,7 @@ const links = [
     {
       label: 'Home',
       icon: 'i-lucide-house',
-      to: '/',
+      to: '/panel/admin',
       onSelect: () => {
         open.value = false
       }

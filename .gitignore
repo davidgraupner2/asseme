@@ -28,4 +28,4 @@ logs
 
 # Database folder
 mydb
-mydb/clog/00000000000000000000.clog
+mydb/clog/*.clog

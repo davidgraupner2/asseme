@@ -2,32 +2,18 @@
 -- This schema supports users belonging to multiple tenants with different roles
 
 -- ======================================================================
--- CLEANUP SECTION - Remove existing tables and functions
+-- CLEANUP SECTION - Remove existing database and namespace
 -- This allows the schema to be run multiple times safely
 -- ======================================================================
+DEFINE NAMESPACE IF NOT EXISTS asseme COMMENT "Assest Me - Primary Namespace";
+USE NS asseme;
+REMOVE DATABASE IF EXISTS root;
+DEFINE DATABASE root COMMENT "Asset Me - Primary Database"; 
+USE DB root;
 
--- Remove existing functions
-REMOVE FUNCTION IF EXISTS fn::get_user_tenants;
-REMOVE FUNCTION IF EXISTS fn::get_tenant_members;
-REMOVE FUNCTION IF EXISTS fn::user_has_permission;
-REMOVE FUNCTION IF EXISTS fn::current_user_has_permission;
-REMOVE FUNCTION IF EXISTS fn::tenant_signup;
-REMOVE FUNCTION IF EXISTS fn::invite_user_to_tenant;
-REMOVE FUNCTION IF EXISTS fn::accept_invitation;
-
--- Remove existing indexes
-REMOVE INDEX IF EXISTS user_email_idx ON TABLE user;
-REMOVE INDEX IF EXISTS tenant_slug_idx ON TABLE tenant;
-REMOVE INDEX IF EXISTS role_slug_idx ON TABLE role;
-REMOVE INDEX IF EXISTS invitation_token_idx ON TABLE invitation;
-
--- Remove existing tables (in reverse dependency order)
-REMOVE TABLE IF EXISTS audit_log;
-REMOVE TABLE IF EXISTS invitation;
-REMOVE TABLE IF EXISTS member_of;
-REMOVE TABLE IF EXISTS role;
-REMOVE TABLE IF EXISTS tenant;
-REMOVE TABLE IF EXISTS user;
+-- Create the SYSTEM DATABASE USER
+USE DB root;
+DEFINE USER admin ON DATABASE PASSWORD 'Asseme1234!' ROLES OWNER,EDITOR,VIEWER DURATION FOR SESSION 1d, FOR TOKEN 1h;
 
 -- ======================================================================
 -- SCHEMA DEFINITION STARTS HERE

@@ -90,7 +90,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   <UAuthForm
     :fields="fields"
     :schema="schema"
-    title="Admin Login"
+    title="Admin Panel Login"
     icon="i-lucide-lock"
     @submit="onSubmit"
   >
