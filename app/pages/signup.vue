@@ -21,10 +21,16 @@ const fields = [
     placeholder: 'Enter your company name'
   },
   {
-    name: 'name',
+    name: 'first_name',
     type: 'text' as const,
-    label: 'Name',
-    placeholder: 'Enter your name'
+    label: 'First Name',
+    placeholder: 'Enter your first name'
+  },
+  {
+    name: 'last_name',
+    type: 'text' as const,
+    label: 'Last Name',
+    placeholder: 'Enter your last name or surname'
   },
   {
     name: 'email',
@@ -37,14 +43,26 @@ const fields = [
     label: 'Password',
     type: 'password' as const,
     placeholder: 'Enter your password'
+  },
+  {
+    name: 'msp',
+    label: 'Managed Service Provider',
+    type: 'checkbox' as const,
+    placeholder: 'Are you a Managed Service Provider'
   }
 ]
 
 const schema = z.object({
   company_name: z.preprocess((val) => val || '', z.string().min(1, 'Company Name is required')),
-  name: z.preprocess((val) => val || '', z.string().min(1, 'Name is required')),
+  first_name: z.preprocess((val) => val || '', z.string().min(1, 'First Name is required')),
+  last_name: z.preprocess((val) => val || '', z.string().min(1, 'Last Name is required')),
   email: z.preprocess((val) => val || '', z.email().min(1, 'Email is required')),
-  password: z.preprocess((val) => val || '', z.string().min(8, 'Must be at least 8 characters'))
+  password: z.preprocess((val) => val || '', z.string().min(8, 'Must be at least 8 characters')),
+  msp: z.preprocess((val) => {
+    // Coerce common checkbox representations to a boolean so z.boolean() receives a true boolean
+    if (val === true || val === 'true' || val === 'on' || val === '1') return true
+    return false
+  }, z.boolean())
 })
 
 type Schema = z.output<typeof schema>
@@ -52,25 +70,23 @@ type Schema = z.output<typeof schema>
 async function onSubmit(event: FormSubmitEvent<Schema>) {
   try {
     const formData = event.data
+    const isMSP = formData.msp ? true : false
 
-    console.log('Submitting signup for:', formData.email)
-
-    // Call the strongly typed API route
     const response = await $fetch('/api/auth/signup', {
       method: 'POST',
       body: {
         company_name: formData.company_name,
-        name: formData.name,
+        first_name: formData.first_name,
+        last_name: formData.last_name,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        isMsp: isMSP
       }
     })
 
-    console.log('Signup result:', response)
-
     toast.add({
       title: 'Success!',
-      description: `Welcome ${formData.name}! Your account has been created.`,
+      description: `Welcome ${formData.first_name}! Your account has been created.`,
       color: 'success'
     })
 

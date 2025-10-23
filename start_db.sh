@@ -1,1 +1,1 @@
-surreal start -u root -p MMRoot_1#@! surrealkv+versioned://mydb -A --bind 0.0.0.0:8082
+surreal start -u root -p kg7y8tieW4R5w surrealkv+versioned://mydb -A --bind 0.0.0.0:8082

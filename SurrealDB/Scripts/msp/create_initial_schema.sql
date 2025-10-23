@@ -234,44 +234,11 @@ INSERT INTO user_role (user, role, tenant, granted_by) VALUES
 (user:widgets_admin, role:tenant_admin, tenant:widgets_inc, user:msp_admin_techcorp),
 (user:enterprise_admin, role:tenant_admin, tenant:enterprise_direct, user:super_admin);
 
--- Enhanced tenant signup function with MSP support
-DEFINE FUNCTION fn::tenant_signup($name: string, $contact_email: string, $tenant_type: string, $parent_tenant_id: option<string>, $msp_tenant_id: option<string>) {
-    -- Generate unique slug
-    LET $base_slug = string::lowercase(string::replace($name, ' ', '-'));
-    LET $base_slug = string::replace($base_slug, '[^a-z0-9-]', '');
-    
-    -- Check if base slug exists and generate unique one
-    LET $existing = SELECT * FROM tenant WHERE slug = $base_slug;
-    LET $unique_slug = IF count($existing) > 0 THEN 
-        $base_slug + '-' + string::lowercase(rand::uuid()) 
-    ELSE 
-        $base_slug 
-    END;
-    
-    -- Determine billing responsibility based on MSP relationship
-    LET $billing_resp = IF $msp_tenant_id != NONE THEN 'msp' ELSE 'self' END;
-    
-    -- Create tenant
-    LET $tenant = CREATE tenant SET 
-        name = $name,
-        slug = $unique_slug,
-        tenant_type = $tenant_type,
-        parent_tenant = IF $parent_tenant_id != NONE THEN type::thing('tenant', $parent_tenant_id) ELSE NONE END,
-        msp_tenant = IF $msp_tenant_id != NONE THEN type::thing('tenant', $msp_tenant_id) ELSE NONE END,
-        contact_email = $contact_email,
-        billing_responsibility = $billing_resp;
-    
-    -- Create MSP relationship if applicable
-    IF $msp_tenant_id != NONE {
-        CREATE msp_customer_relationship SET
-            msp_tenant = type::thing('tenant', $msp_tenant_id),
-            customer_tenant = $tenant.id,
-            relationship_type = 'managed',
-            billing_arrangement = 'msp_pays';
-    };
-    
-    RETURN $tenant;
-};
+-- ======================================================================
+-- UTILITY FUNCTIONS (WORKING - KEEP THESE)
+-- ======================================================================
+-- Note: Problematic signup functions have been removed. 
+-- User/tenant creation is now handled directly via API endpoints.
 
 -- Function to get user's accessible tenants based on role hierarchy
 DEFINE FUNCTION fn::get_user_accessible_tenants($user_id: string) {
@@ -376,51 +343,6 @@ DEFINE FUNCTION fn::create_super_admin($creator_user_id: string, $email: string,
         is_active = true;
     
     RETURN $user;
-};
-
--- Function for secure MSP/Customer signup (prevents super admin creation)
-DEFINE FUNCTION fn::secure_signup($email: string, $password: string, $first_name: string, $last_name: string, $phone: option<string>, $tenant_name: string, $tenant_type: string, $contact_email: string, $contact_phone: option<string>, $parent_tenant_id: option<string>, $msp_tenant_id: option<string>) {
-    -- Prevent super admin creation through signup
-    IF $tenant_type = 'super_admin' {
-        THROW 'Cannot create Super Admin tenants through signup';
-    };
-    
-    -- Check if email already exists
-    LET $existing_user = SELECT * FROM user WHERE email = $email;
-    IF count($existing_user) > 0 {
-        THROW 'User with this email already exists';
-    };
-    
-    -- Create tenant first
-    LET $tenant = fn::tenant_signup($tenant_name, $contact_email, $tenant_type, $parent_tenant_id, $msp_tenant_id);
-    
-    -- Create user
-    LET $user = CREATE user SET 
-        email = $email,
-        password_hash = crypto::argon2::generate($password),
-        password_must_change = false,
-        first_name = $first_name,
-        last_name = $last_name,
-        phone = $phone,
-        primary_tenant = $tenant.id,
-        accessible_tenants = [$tenant.id],
-        is_active = true,
-        password_changed_at = time::now();
-    
-    -- Assign appropriate role based on tenant type
-    LET $role_id = IF $tenant_type = 'msp' THEN role:msp_admin ELSE role:tenant_admin END;
-    
-    CREATE user_role SET
-        user = $user.id,
-        role = $role_id,
-        tenant = $tenant.id,
-        granted_by = user:super_admin,
-        is_active = true;
-    
-    RETURN {
-        user: $user,
-        tenant: $tenant
-    };
 };
 
 -- Function to verify password
@@ -644,6 +566,23 @@ DEFINE FUNCTION fn::assign_role_with_permissions($assigner_user_id: string, $tar
     
     RETURN 'Role assigned successfully';
 };
+
+-- ======================================================================
+-- API INTEGRATION NOTES
+-- ======================================================================
+-- User and tenant signup is now handled directly in the API layer:
+-- POST /api/auth/signup handles user/tenant creation with these benefits:
+-- 1. Better error handling and validation
+-- 2. Avoids complex function parameter issues  
+-- 3. More reliable than problematic schema functions
+-- 4. Maintains all security and permission features
+-- 5. Easier debugging and maintenance
+--
+-- The following functions were removed due to technical issues:
+-- - fn::secure_signup (option<string> parameter handling issues)
+-- - fn::tenant_signup (rand::uuid() syntax compatibility issues)
+--
+-- Current working approach uses direct SQL operations in the API
 
 -- Sample queries to demonstrate the hierarchy:
 

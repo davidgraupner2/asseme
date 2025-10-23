@@ -2,13 +2,22 @@
 
 This document provides detailed information about all the functions available in the MSP database schema.
 
+## ⚠️ Important Note
+
+**User and tenant signup is now handled directly via API endpoints** (`/api/auth/signup`) rather than schema functions. This provides better error handling, validation, and reliability.
+
+**Removed Functions:** The following functions have been removed due to technical compatibility issues:
+
+- `fn::secure_signup()` - Had option<string> parameter handling issues
+- `fn::tenant_signup()` - Had rand::uuid() syntax compatibility issues
+
 ## 📋 Function Categories
 
 - [User Management](#user-management)
-- [Tenant Operations](#tenant-operations)
 - [Permission System](#permission-system)
 - [Authentication](#authentication)
 - [Role Management](#role-management)
+- [Administrative Functions](#administrative-functions)
 
 ---
 
@@ -89,6 +98,35 @@ fn::update_user_with_permissions(
 - Updater must have appropriate permissions for target user's tenant
 - Users can always update themselves
 
+---
+
+## Administrative Functions
+
+### `fn::update_user_with_permissions()`
+
+Updates an existing user with permission validation.
+
+**Signature:**
+
+```sql
+fn::update_user_with_permissions(
+    $updater_user_id: string,
+    $target_user_id: string,
+    $updates: object
+) -> string
+```
+
+**Parameters:**
+
+- `updater_user_id`: ID of user performing the update
+- `target_user_id`: ID of user being updated
+- `updates`: Object containing fields to update
+
+**Permission Checks:**
+
+- Updater must have appropriate permissions for target user's tenant
+- Users can always update themselves
+
 **Example:**
 
 ```sql
@@ -99,98 +137,6 @@ SELECT * FROM fn::update_user_with_permissions(
         first_name: 'Updated',
         phone: '+1-555-9999'
     }
-);
-```
-
----
-
-## Tenant Operations
-
-### `fn::tenant_signup()`
-
-Creates a new tenant with automatic slug generation and MSP relationship setup.
-
-**Signature:**
-
-```sql
-fn::tenant_signup(
-    $name: string,
-    $contact_email: string,
-    $tenant_type: string,
-    $parent_tenant_id: option<string>,
-    $msp_tenant_id: option<string>
-) -> tenant
-```
-
-**Parameters:**
-
-- `name`: Display name for the tenant
-- `contact_email`: Primary contact email
-- `tenant_type`: Type (`'super_admin'`, `'msp'`, `'customer'`)
-- `parent_tenant_id`: Optional parent tenant ID
-- `msp_tenant_id`: Optional MSP tenant ID for billing
-
-**Features:**
-
-- Automatic slug generation with collision handling
-- MSP relationship creation
-- Billing responsibility determination
-
-**Example:**
-
-```sql
-SELECT * FROM fn::tenant_signup(
-    'Acme Corporation',
-    'admin@acme.com',
-    'customer',
-    'msp_techcorp',
-    'msp_techcorp'
-);
-```
-
-### `fn::secure_signup()`
-
-Complete tenant and admin user creation in a single transaction.
-
-**Signature:**
-
-```sql
-fn::secure_signup(
-    $email: string,
-    $password: string,
-    $first_name: string,
-    $last_name: string,
-    $phone: option<string>,
-    $tenant_name: string,
-    $tenant_type: string,
-    $contact_email: string,
-    $contact_phone: option<string>,
-    $parent_tenant_id: option<string>,
-    $msp_tenant_id: option<string>
-) -> { user, tenant }
-```
-
-**Security Features:**
-
-- Prevents super admin creation through signup
-- Email uniqueness validation
-- Automatic role assignment based on tenant type
-
-**Example:**
-
-```sql
-SELECT * FROM fn::secure_signup(
-    'admin@newcustomer.com',
-    'TempPassword123!',
-    'Admin',
-    'User',
-    '+1-555-0155',
-    'New Customer Inc',
-    'customer',
-    'billing@newcustomer.com',
-    '+1-555-0156',
-    'msp_techcorp',
-    'msp_techcorp'
 );
 ```
 
@@ -409,8 +355,51 @@ All functions include comprehensive error handling:
 
 ## Best Practices
 
-1. **Always use permission-checking functions** instead of direct table access
-2. **Validate user input** before passing to functions
-3. **Handle errors gracefully** in your application
-4. **Use transactions** for multi-step operations
-5. **Log function calls** for audit trails
+1. **Use API endpoints for user/tenant creation** instead of schema functions
+2. **Always use permission-checking functions** for authorization
+3. **Validate user input** before passing to functions
+4. **Handle errors gracefully** in your application
+5. **Use transactions** for multi-step operations
+6. **Log function calls** for audit trails
+
+## API Integration
+
+### User/Tenant Signup
+
+Instead of using schema functions, use the API endpoint:
+
+**Endpoint:** `POST /api/auth/signup`
+
+**Request Body:**
+
+```json
+{
+  "email": "user@example.com",
+  "password": "SecurePassword123!",
+  "first_name": "John",
+  "last_name": "Doe",
+  "company_name": "Company Name",
+  "isMsp": false
+}
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Account created successfully",
+  "data": {
+    "user": { "id": "user:...", "email": "...", "name": "..." },
+    "tenant": { "id": "tenant:...", "name": "...", "slug": "..." },
+    "membership": { "id": "...", "role": "Tenant Admin", "status": "active" }
+  }
+}
+```
+
+This approach provides:
+
+- Better error handling and validation
+- Improved reliability over complex schema functions
+- Easier debugging and maintenance
+- Full compatibility with frontend frameworks

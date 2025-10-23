@@ -2,6 +2,10 @@
 
 This guide provides practical examples for common operations using the MSP database schema.
 
+## ⚠️ Important Note
+
+**User and tenant creation is now handled via API endpoints** instead of schema functions for better reliability and error handling.
+
 ## 🚀 Getting Started Examples
 
 ### Initial Setup
@@ -31,61 +35,75 @@ SELECT * FROM fn::change_password(
 
 ## 🏢 Organization Setup
 
-### Creating Your First MSP
+### Creating Your First MSP (via API)
 
-```sql
--- Create a new MSP with admin user
-SELECT * FROM fn::secure_signup(
-    'admin@techcorp-msp.com',
-    'SecurePassword123!',
-    'Tech',
-    'Admin',
-    '+1-555-TECH',
-    'TechCorp MSP',
-    'msp',
-    'billing@techcorp-msp.com',
-    '+1-555-TECH-BILL',
-    'super_admin',  -- Parent tenant
-    NONE           -- No MSP (this IS the MSP)
-);
+**Endpoint:** `POST /api/auth/signup`
+
+```json
+{
+  "email": "admin@techcorp-msp.com",
+  "password": "SecurePassword123!",
+  "first_name": "Tech",
+  "last_name": "Admin",
+  "company_name": "TechCorp MSP",
+  "isMsp": true
+}
 ```
 
-### Adding a Customer Under the MSP
+**Response:**
 
-```sql
--- Create customer tenant with admin
-SELECT * FROM fn::secure_signup(
-    'admin@acmecorp.com',
-    'CustomerPassword123!',
-    'Jane',
-    'Smith',
-    '+1-555-ACME',
-    'Acme Corporation',
-    'customer',
-    'billing@acmecorp.com',
-    '+1-555-ACME-BILL',
-    'msp_techcorp',  -- Parent MSP
-    'msp_techcorp'   -- MSP handles billing
-);
+```json
+{
+  "success": true,
+  "data": {
+    "user": {
+      "id": "user:msp_admin_techcorp",
+      "email": "admin@techcorp-msp.com",
+      "name": "Tech Admin"
+    },
+    "tenant": {
+      "id": "tenant:techcorp_msp",
+      "name": "TechCorp MSP",
+      "slug": "techcorp-msp"
+    },
+    "membership": {
+      "role": "MSP Admin",
+      "status": "active"
+    }
+  }
+}
 ```
 
-### Creating a Direct Customer (No MSP)
+### Adding a Customer Under the MSP (via API)
 
-```sql
--- Direct customer under Super Admin
-SELECT * FROM fn::secure_signup(
-    'admin@enterprise.com',
-    'EnterprisePassword123!',
-    'Enterprise',
-    'Admin',
-    '+1-555-ENTER',
-    'Enterprise Direct',
-    'customer',
-    'billing@enterprise.com',
-    '+1-555-ENTER-BILL',
-    'super_admin',  -- Direct under super admin
-    NONE           -- No MSP
-);
+**Endpoint:** `POST /api/auth/signup`
+
+```json
+{
+  "email": "admin@acmecorp.com",
+  "password": "CustomerPassword123!",
+  "first_name": "Jane",
+  "last_name": "Smith",
+  "company_name": "Acme Corporation",
+  "isMsp": false
+}
+```
+
+Note: MSP relationships can be established afterwards via administrative functions.
+
+### Creating a Direct Customer (No MSP) (via API)
+
+**Endpoint:** `POST /api/auth/signup`
+
+```json
+{
+  "email": "admin@enterprise.com",
+  "password": "EnterprisePassword123!",
+  "first_name": "Enterprise",
+  "last_name": "Admin",
+  "company_name": "Enterprise Direct",
+  "isMsp": false
+}
 ```
 
 ## 👥 User Management
