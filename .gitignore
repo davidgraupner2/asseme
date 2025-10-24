@@ -29,3 +29,6 @@ logs
 # Database folder
 mydb
 mydb/clog/*.clog
+
+# Certificates
+certs

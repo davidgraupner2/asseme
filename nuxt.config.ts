@@ -12,6 +12,13 @@ export default defineNuxtConfig({
     'pinia-plugin-persistedstate/nuxt'
   ],
 
+  devServer: {
+    https: {
+      key: './certs/key.pem', // Path to your SSL key file
+      cert: './certs/cert.pem' // Path to your SSL certificate file
+    }
+  },
+
   $development: {
     surrealdb: {
       databases: {
